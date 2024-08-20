@@ -114,17 +114,17 @@ class _HomePageState extends State<HomePage> {
                   child: ListTile(
                     title: RichText(
                         text: TextSpan(
-                            text: "${filterNotes[index].title}",
+                            text: "${filterNotes[index].title} \n",
                             style: TextStyle(
                                 color: Colors.grey.shade600,
-                                fontSize: 18,
+                                fontSize: 20,
                                 height: 1.5),
                             children: [
                           TextSpan(
                               text: "${filterNotes[index].content}",
                               style: TextStyle(
                                   color: Colors.grey.shade800,
-                                  fontSize: 14,
+                                  fontSize: 18,
                                   height: 1.5))
                         ])),
                     trailing: IconButton(
@@ -146,11 +146,22 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         elevation: 10,
         backgroundColor: Colors.grey.shade800,
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (BuildContext context) => EditScreen()));
+          if (result != null) {
+            setState(() {
+              filterNotes.add(
+                Note(
+                  id: uuid.v4(),
+                  title: result['title'],
+                  content: result['content'],
+                ),
+              );
+            });
+          }
         },
         child: Icon(
           Icons.add,

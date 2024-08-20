@@ -92,13 +92,10 @@ class _EditScreenState extends State<EditScreen> {
           String titleText = _titleController.text;
           String contentText = _contentController.text;
 
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => HomePage(
-                        titleText: titleText,
-                        contentText: contentText,
-                      )));
+          Navigator.pop(context, {
+            'title': titleText,
+            'content': contentText,
+          });
         },
         elevation: 10,
         backgroundColor: Colors.grey.shade800,
