@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:my_note_app/models/note_model.dart';
+import 'package:my_note_app/models/note_provider.dart';
 import 'package:my_note_app/pages/home.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class EditScreen extends StatefulWidget {
   final List<Note>? notes;
-  EditScreen({super.key, this.notes});
+  final Note? note;
+  EditScreen({super.key, this.notes, this.note});
 
   @override
   State<EditScreen> createState() => _EditScreenState();
@@ -13,15 +16,21 @@ class EditScreen extends StatefulWidget {
 
 class _EditScreenState extends State<EditScreen> {
   late List<Note> notes = [];
-  TextEditingController _titleController = TextEditingController();
 
-  TextEditingController _contentController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+
+  final TextEditingController _contentController = TextEditingController();
 
   var uuid = Uuid();
+
+  @override
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    if (widget.note != null) {
+      _titleController.text = widget.note!.title;
+      _contentController.text = widget.note!.content;
+    }
   }
 
   // void _addNote() {
@@ -89,13 +98,10 @@ class _EditScreenState extends State<EditScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          String titleText = _titleController.text;
-          String contentText = _contentController.text;
-
-          Navigator.pop(context, {
-            'title': titleText,
-            'content': contentText,
-          });
+          final noteProvider =
+              Provider.of<NoteProvider>(context, listen: false);
+          noteProvider.addNote(_titleController.text, _contentController.text);
+          Navigator.pop(context);
         },
         elevation: 10,
         backgroundColor: Colors.grey.shade800,

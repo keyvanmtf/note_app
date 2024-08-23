@@ -12,6 +12,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   uuid: ^4.4.2
+  provider: ^6.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

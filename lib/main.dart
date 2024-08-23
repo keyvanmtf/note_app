@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_note_app/models/note_provider.dart';
 import 'package:my_note_app/pages/home.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => NoteProvider(), child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {

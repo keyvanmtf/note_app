@@ -3,8 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:my_note_app/constant/colors.dart';
 import 'package:my_note_app/models/note_model.dart';
+import 'package:my_note_app/models/note_provider.dart';
 import 'package:my_note_app/pages/edit.dart';
 import 'package:my_note_app/widgets/delete_button.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,7 +24,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Note> filterNotes = [];
 
-  var uuid = Uuid();
+  var uuid = const Uuid();
   @override
   void initState() {
     super.initState();
@@ -40,23 +42,6 @@ class _HomePageState extends State<HomePage> {
   getRandomColor() {
     Random random = Random();
     return backgroundColors[random.nextInt(backgroundColors.length)];
-  }
-
-  // void searchNotes(String searchText) {
-  //   setState(() {
-  //     filterNotes = sampleNotes
-  //         .where((note) =>
-  //             note.title.toLowerCase().contains(searchText.toLowerCase()) ||
-  //             note.content.toLowerCase().contains(searchText.toLowerCase()))
-  //         .toList();
-  //   });
-  // }
-
-  void deleteNote(index) {
-    print("Index to delete: $index");
-    setState(() {
-      filterNotes.removeAt(index);
-    });
   }
 
   @override
@@ -86,7 +71,10 @@ class _HomePageState extends State<HomePage> {
               height: 20,
             ),
             TextField(
-                // onChanged: searchNotes,
+                onChanged: (value) {
+                  Provider.of<NoteProvider>(context, listen: false)
+                      .searchNotes(value);
+                },
                 style: const TextStyle(fontSize: 16, color: Colors.white),
                 decoration: InputDecoration(
                   hintText: "جستجو",
@@ -102,44 +90,38 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 25,
             ),
-            Expanded(
-                child: ListView.builder(
-              itemCount: filterNotes.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: EdgeInsets.only(top: 30),
-                  color: getRandomColor(),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  child: ListTile(
-                    title: RichText(
-                        text: TextSpan(
-                            text: "${filterNotes[index].title} \n",
-                            style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontSize: 20,
-                                height: 1.5),
-                            children: [
-                          TextSpan(
-                              text: "${filterNotes[index].content}",
-                              style: TextStyle(
-                                  color: Colors.grey.shade800,
-                                  fontSize: 18,
-                                  height: 1.5))
-                        ])),
-                    trailing: IconButton(
-                      onPressed: () async {
-                        final result = await confirmDilog(context);
-                        if (result == true) {
-                          deleteNote(index);
-                        }
-                      },
-                      icon: Icon(Icons.delete),
-                    ),
-                  ),
-                );
-              },
-            )),
+            Expanded(child:
+                Consumer<NoteProvider>(builder: (context, noteProvider, child) {
+              return ListView.builder(
+                itemCount: noteProvider.notes.length,
+                itemBuilder: (context, index) {
+                  final note = noteProvider.notes[index];
+                  return Card(
+                    margin: EdgeInsets.only(top: 30),
+                    color: getRandomColor(),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: ListTile(
+                        title: RichText(
+                            text: TextSpan(
+                                text: "${noteProvider.notes[index].title} \n",
+                                style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 20,
+                                    height: 1.5),
+                                children: [
+                              TextSpan(
+                                  text: "${noteProvider.notes[index].content}",
+                                  style: TextStyle(
+                                      color: Colors.grey.shade800,
+                                      fontSize: 18,
+                                      height: 1.5))
+                            ])),
+                        trailing: DeleteButton(noteId: note.id)),
+                  );
+                },
+              );
+            })),
           ],
         ),
       ),
@@ -152,15 +134,10 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(
                   builder: (BuildContext context) => EditScreen()));
           if (result != null) {
-            setState(() {
-              filterNotes.add(
-                Note(
-                  id: uuid.v4(),
-                  title: result['title'],
-                  content: result['content'],
-                ),
-              );
-            });
+            Provider.of<NoteProvider>(context, listen: false).addNote(
+              result['title'],
+              result['content'],
+            );
           }
         },
         child: Icon(
