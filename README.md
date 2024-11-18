@@ -48,3 +48,18 @@ Follow these steps to run the project locally:
    ```bash
    git clone <repository-url>
 
+   Navigate to the project directory:
+bash
+Copy code
+cd note_app-main
+Run the app on a connected device or emulator:
+bash
+Copy code
+flutter run
+Dependencies
+The app relies on the following dependencies:
+
+Flutter SDK: ^2.0.0
+UUID: ^3.0.4 (for generating unique IDs for each note)
+Ensure that these dependencies are added in the pubspec.yaml file.
+
